@@ -3,7 +3,12 @@
 // Total transactions: 3254
 // Date range: 2024-12 to 2025-12
 // Total YTD spending: $399,594.90
-// NOTE: Duplicate mortgage transactions removed (kept 1 per month)
+// Total YTD interest: $17,531.83
+//
+// FIXES APPLIED:
+// - Removed 2 duplicate mortgage transactions
+// - Consolidated 'Mortgage' category into 'Housing - Mortgage'
+// - Corrected YTD interest to full year total
 //
 
 const EXPENSE_DATA = {
@@ -29,7 +34,7 @@ const EXPENSE_DATA = {
   },
   "summary": {
     "totalExpenses": 399594.9,
-    "totalInterestYTD": 2091.63,
+    "totalInterestYTD": 17531.83,
     "totalDebt": 345598.02
   },
   "transactions": [
@@ -9620,7 +9625,7 @@ const EXPENSE_DATA = {
     {
       "date": "2025-05-06",
       "description": "Rushmore Mortgage Payment",
-      "category": "Mortgage",
+      "category": "Housing - Mortgage",
       "amount": 3585.59,
       "person": "Edmund",
       "source": "Chase Bank"
@@ -11740,7 +11745,7 @@ const EXPENSE_DATA = {
     {
       "date": "2025-06-06",
       "description": "Rushmore Mortgage Payment",
-      "category": "Mortgage",
+      "category": "Housing - Mortgage",
       "amount": 3585.59,
       "person": "Edmund",
       "source": "Chase Bank"
@@ -13716,7 +13721,7 @@ const EXPENSE_DATA = {
     {
       "date": "2025-07-01",
       "description": "Rushmore Mortgage Payment",
-      "category": "Mortgage",
+      "category": "Housing - Mortgage",
       "amount": 3585.59,
       "person": "Edmund",
       "source": "Rushmore Mortgage"
@@ -26141,14 +26146,14 @@ const EXPENSE_DATA = {
       "percent": 0.1098
     },
     {
+      "category": "Housing - Mortgage",
+      "amount": 39441.49,
+      "percent": 0.0987
+    },
+    {
       "category": "Miscellaneous",
       "amount": 35633.16,
       "percent": 0.0892
-    },
-    {
-      "category": "Housing - Mortgage",
-      "amount": 28684.72,
-      "percent": 0.0718
     },
     {
       "category": "Health Insurance",
@@ -26184,11 +26189,6 @@ const EXPENSE_DATA = {
       "category": "Other",
       "amount": 11628.35,
       "percent": 0.0291
-    },
-    {
-      "category": "Mortgage",
-      "amount": 10756.77,
-      "percent": 0.0269
     },
     {
       "category": "Entertainment",
