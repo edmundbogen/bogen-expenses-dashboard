@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bogen Family Expenses Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-blue: #2563eb;
+            --primary-blue-light: #3b82f6;
+            --success-green: #10b981;
+            --success-green-light: #34d399;
+            --danger-red: #ef4444;
+            --danger-red-light: #f87171;
+            --warning-yellow: #f59e0b;
+            --neutral-gray: #6b7280;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background: var(--bg-secondary);
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-box h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .login-box p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .login-box button:hover {
+            background: var(--primary-blue-light);
+        }
+
+        .login-error {
+            color: var(--danger-red);
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* Dashboard Layout */
+        #dashboard {
+            display: none;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .header-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--text-secondary);
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+        }
+
+        .nav-tabs-inner {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            border: none;
+            background: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Filters Bar */
+        .filters-bar {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 0.625rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            min-width: 150px;
+            background: var(--bg-secondary);
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .search-input {
+            min-width: 250px !important;
+        }
+
+        .clear-filters-btn {
+            padding: 0.625rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .clear-filters-btn:hover {
+            background: var(--border-color);
+        }
+
+        /* Metric Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .metric-card.warning {
+            border-left: 4px solid var(--danger-red);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .metric-value.positive {
+            color: var(--success-green);
+        }
+
+        .metric-value.negative {
+            color: var(--danger-red);
+        }
+
+        .metric-value.neutral {
+            color: var(--primary-blue);
+        }
+
+        .metric-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Tables */
+        .table-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.875rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: var(--border-color);
+        }
+
+        th .sort-indicator {
+            margin-left: 0.5rem;
+            opacity: 0.5;
+        }
+
+        th.sorted .sort-indicator {
+            opacity: 1;
+        }
+
+        td {
+            font-size: 0.875rem;
+        }
+
+        tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .amount-positive {
+            color: var(--success-green);
+            font-weight: 600;
+        }
+
+        .amount-negative {
+            color: var(--danger-red);
+            font-weight: 600;
+        }
+
+        .amount-neutral {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        /* Pagination */
+        .pagination {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--bg-tertiary);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* Person/Category Detail */
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .back-btn:hover {
+            background: var(--border-color);
+        }
+
+        .person-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Debt Tracker */
+        .debt-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .debt-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .debt-card-header {
+            padding: 1rem 1.5rem;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .debt-card-header h4 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .debt-card-header .debt-type {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .debt-card-body {
+            padding: 1.5rem;
+        }
+
+        .debt-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .debt-stat:last-child {
+            margin-bottom: 0;
+        }
+
+        .debt-stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .debt-stat-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .debt-notes {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Clickable rows */
+        .clickable-row {
+            cursor: pointer;
+        }
+
+        .clickable-row:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .nav-tabs {
+                padding: 0 1rem;
+            }
+
+            .filters-row {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-group select,
+            .filter-group input {
+                width: 100%;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            th, td {
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        /* Summary cards in person view */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-card {
+            background: var(--bg-tertiary);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+        }
+
+        .summary-card-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .summary-card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h1>Bogen Family</h1>
+            <p>Expense Dashboard</p>
+            <form id="login-form">
+                <input type="password" id="password-input" placeholder="Enter password" autocomplete="current-password">
+                <button type="submit">Access Dashboard</button>
+            </form>
+            <p class="login-error" id="login-error">Incorrect password. Please try again.</p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1>Bogen Family Expenses</h1>
+                    <span class="header-subtitle" id="last-updated">Last updated: Loading...</span>
+                </div>
+                <div class="header-actions">
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <div class="nav-tabs-inner">
+                <button class="nav-tab active" data-tab="overview">Overview</button>
+                <button class="nav-tab" data-tab="transactions">Transactions</button>
+                <button class="nav-tab" data-tab="by-person">By Person</button>
+                <button class="nav-tab" data-tab="by-category">By Category</button>
+                <button class="nav-tab" data-tab="debt-tracker">Debt Tracker</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Filters Bar -->
+            <div class="filters-bar">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label>Month</label>
+                        <select id="filter-month">
+                            <option value="all">All Months</option>
+                            <option value="2025-01">January 2025</option>
+                            <option value="2025-02">February 2025</option>
+                            <option value="2025-03">March 2025</option>
+                            <option value="2025-04">April 2025</option>
+                            <option value="2025-05">May 2025</option>
+                            <option value="2025-06">June 2025</option>
+                            <option value="2025-07">July 2025</option>
+                            <option value="2025-08">August 2025</option>
+                            <option value="2025-09">September 2025</option>
+                            <option value="2025-10">October 2025</option>
+                            <option value="2025-11">November 2025</option>
+                            <option value="2025-12">December 2025</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Person</label>
+                        <select id="filter-person">
+                            <option value="all">All Family Members</option>
+                            <option value="Edmund">Edmund</option>
+                            <option value="Sam">Sam</option>
+                            <option value="Sophie">Sophie</option>
+                            <option value="Chloe">Chloe</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Category</label>
+                        <select id="filter-category">
+                            <option value="all">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Date From</label>
+                        <input type="date" id="filter-date-from">
+                    </div>
+                    <div class="filter-group">
+                        <label>Date To</label>
+                        <input type="date" id="filter-date-to">
+                    </div>
+                    <div class="filter-group">
+                        <label>Search</label>
+                        <input type="text" id="filter-search" placeholder="Search descriptions..." class="search-input">
+                    </div>
+                    <button class="clear-filters-btn" onclick="clearFilters()">Clear Filters</button>
+                </div>
+            </div>
+
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="tab-overview">
+                <!-- Key Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Total Expenses (YTD)</div>
+                        <div class="metric-value neutral" id="metric-total-ytd">$0.00</div>
+                        <div class="metric-subtitle" id="metric-total-subtitle">365 transactions</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Current Month</div>
+                        <div class="metric-value neutral" id="metric-current-month">$0.00</div>
+                        <div class="metric-subtitle" id="metric-month-name">November 2025</div>
+                    </div>
+                    <div class="metric-card warning">
+                        <div class="metric-label">Total Interest Paid</div>
+                        <div class="metric-value negative" id="metric-interest">$0.00</div>
+                        <div class="metric-subtitle">Monthly interest charges</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Total Debt Balance</div>
+                        <div class="metric-value negative" id="metric-debt">$0.00</div>
+                        <div class="metric-subtitle" id="metric-debt-subtitle">Across all accounts</div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Spending by Family Member</h3>
+                        <div class="chart-container">
+                            <canvas id="chart-by-person"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Top 10 Categories</h3>
+                        <div class="chart-container">
+                            <canvas id="chart-by-category"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Monthly Spending Trend</h3>
+                        <div class="chart-container">
+                            <canvas id="chart-monthly-trend"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Monthly Spending by Person</h3>
+                        <div class="chart-container">
+                            <canvas id="chart-monthly-by-person"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Person Summary Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Family Member Summary</h3>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="person-summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Person</th>
+                                    <th>Total Spent</th>
+                                    <th>% of Family</th>
+                                    <th># Transactions</th>
+                                    <th>Avg Transaction</th>
+                                </tr>
+                            </thead>
+                            <tbody id="person-summary-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions Tab -->
+            <div class="tab-content" id="tab-transactions">
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>All Transactions</h3>
+                        <span id="transactions-count">0 transactions</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="date">Date <span class="sort-indicator">↕</span></th>
+                                    <th data-sort="description">Description <span class="sort-indicator">↕</span></th>
+                                    <th data-sort="category">Category <span class="sort-indicator">↕</span></th>
+                                    <th data-sort="amount">Amount <span class="sort-indicator">↕</span></th>
+                                    <th data-sort="person">Person <span class="sort-indicator">↕</span></th>
+                                    <th data-sort="source">Source <span class="sort-indicator">↕</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span class="pagination-info" id="pagination-info">Showing 1-25 of 365</span>
+                        <div class="pagination-buttons" id="pagination-buttons"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- By Person Tab -->
+            <div class="tab-content" id="tab-by-person">
+                <div id="person-list-view">
+                    <div class="metrics-grid" id="person-cards"></div>
+                </div>
+                <div id="person-detail-view" style="display: none;">
+                    <div class="detail-header">
+                        <button class="back-btn" onclick="showPersonList()">← Back to All</button>
+                        <div class="person-avatar" id="person-avatar">E</div>
+                        <div>
+                            <h2 id="person-name">Edmund</h2>
+                            <span class="header-subtitle" id="person-subtitle">Family Member</span>
+                        </div>
+                    </div>
+                    <div class="summary-cards" id="person-summary-cards"></div>
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3>Spending by Category</h3>
+                            <div class="chart-container">
+                                <canvas id="chart-person-categories"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h3>Transactions</h3>
+                            <span id="person-transactions-count">0 transactions</span>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>Source</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="person-transactions-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- By Category Tab -->
+            <div class="tab-content" id="tab-by-category">
+                <div id="category-list-view">
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h3>Category Analysis</h3>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>% of Total</th>
+                                        <th># Transactions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="category-analysis-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="category-detail-view" style="display: none;">
+                    <div class="detail-header">
+                        <button class="back-btn" onclick="showCategoryList()">← Back to All</button>
+                        <div>
+                            <h2 id="category-name">Category Name</h2>
+                            <span class="header-subtitle" id="category-subtitle">0 transactions</span>
+                        </div>
+                    </div>
+                    <div class="summary-cards" id="category-summary-cards"></div>
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h3>Transactions in Category</h3>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Person</th>
+                                        <th>Source</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="category-transactions-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Debt Tracker Tab -->
+            <div class="tab-content" id="tab-debt-tracker">
+                <!-- Debt Summary -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Total Debt</div>
+                        <div class="metric-value negative" id="debt-total">$0.00</div>
+                        <div class="metric-subtitle">All accounts combined</div>
+                    </div>
+                    <div class="metric-card warning">
+                        <div class="metric-label">Monthly Interest</div>
+                        <div class="metric-value negative" id="debt-monthly-interest">$0.00</div>
+                        <div class="metric-subtitle">Current month charges</div>
+                    </div>
+                    <div class="metric-card warning">
+                        <div class="metric-label">Annualized Interest</div>
+                        <div class="metric-value negative" id="debt-annual-interest">$0.00</div>
+                        <div class="metric-subtitle">Projected yearly cost</div>
+                    </div>
+                </div>
+
+                <!-- Debt Cards -->
+                <div class="debt-grid" id="debt-cards"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Data File -->
+    <script src="data.js"></script>
+
+    <!-- Application Logic -->
+    <script>
+        // Configuration
+        const PASSWORD = "BogenFamily2025";
+        const ITEMS_PER_PAGE = 25;
+
+        // State
+        let currentPage = 1;
+        let filteredTransactions = [];
+        let sortColumn = 'date';
+        let sortDirection = 'desc';
+        let charts = {};
+
+        // Color schemes
+        const PERSON_COLORS = {
+            'Edmund': '#2563eb',
+            'Sam': '#10b981',
+            'Sophie': '#f59e0b',
+            'Chloe': '#ec4899'
+        };
+
+        const CATEGORY_COLORS = [
+            '#2563eb', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6',
+            '#06b6d4', '#84cc16', '#f97316', '#ef4444', '#6366f1',
+            '#14b8a6', '#eab308', '#f43f5e', '#a855f7', '#22c55e'
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            initializeApp();
+        });
+
+        // Authentication
+        function checkAuth() {
+            const isAuth = sessionStorage.getItem('bogen-auth');
+            if (isAuth === 'true') {
+                showDashboard();
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('password-input');
+            if (input.value === PASSWORD) {
+                sessionStorage.setItem('bogen-auth', 'true');
+                showDashboard();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+                input.value = '';
+            }
+        });
+
+        function showDashboard() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        }
+
+        function logout() {
+            sessionStorage.removeItem('bogen-auth');
+            location.reload();
+        }
+
+        // Initialize App
+        function initializeApp() {
+            // Update last updated
+            document.getElementById('last-updated').textContent = `Last updated: ${EXPENSE_DATA.metadata.lastUpdated}`;
+
+            // Populate category filter
+            const categories = [...new Set(EXPENSE_DATA.transactions.map(t => t.category))].sort();
+            const categoryFilter = document.getElementById('filter-category');
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                categoryFilter.appendChild(option);
+            });
+
+            // Set up tab navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+
+            // Set up filter listeners
+            document.getElementById('filter-month').addEventListener('change', applyFilters);
+            document.getElementById('filter-person').addEventListener('change', applyFilters);
+            document.getElementById('filter-category').addEventListener('change', applyFilters);
+            document.getElementById('filter-date-from').addEventListener('change', applyFilters);
+            document.getElementById('filter-date-to').addEventListener('change', applyFilters);
+            document.getElementById('filter-search').addEventListener('input', debounce(applyFilters, 300));
+
+            // Set up table sorting
+            document.querySelectorAll('#transactions-table th[data-sort]').forEach(th => {
+                th.addEventListener('click', () => sortTable(th.dataset.sort));
+            });
+
+            // Initial render
+            applyFilters();
+            renderOverview();
+            renderPersonCards();
+            renderCategoryAnalysis();
+            renderDebtTracker();
+        }
+
+        // Tab Navigation
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+        }
+
+        // Filters
+        function applyFilters() {
+            const month = document.getElementById('filter-month').value;
+            const person = document.getElementById('filter-person').value;
+            const category = document.getElementById('filter-category').value;
+            const dateFrom = document.getElementById('filter-date-from').value;
+            const dateTo = document.getElementById('filter-date-to').value;
+            const search = document.getElementById('filter-search').value.toLowerCase();
+
+            filteredTransactions = EXPENSE_DATA.transactions.filter(t => {
+                if (month !== 'all' && !t.date.startsWith(month)) return false;
+                if (person !== 'all' && t.person !== person) return false;
+                if (category !== 'all' && t.category !== category) return false;
+                if (dateFrom && t.date < dateFrom) return false;
+                if (dateTo && t.date > dateTo) return false;
+                if (search && !t.description.toLowerCase().includes(search)) return false;
+                return true;
+            });
+
+            currentPage = 1;
+            renderTransactionsTable();
+            updateOverviewMetrics();
+            updateCharts();
+        }
+
+        function clearFilters() {
+            document.getElementById('filter-month').value = 'all';
+            document.getElementById('filter-person').value = 'all';
+            document.getElementById('filter-category').value = 'all';
+            document.getElementById('filter-date-from').value = '';
+            document.getElementById('filter-date-to').value = '';
+            document.getElementById('filter-search').value = '';
+            applyFilters();
+        }
+
+        // Overview
+        function renderOverview() {
+            updateOverviewMetrics();
+            renderCharts();
+            renderPersonSummaryTable();
+        }
+
+        function updateOverviewMetrics() {
+            const total = filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
+            document.getElementById('metric-total-ytd').textContent = formatCurrency(total);
+            document.getElementById('metric-total-subtitle').textContent = `${filteredTransactions.length} transactions`;
+
+            // Current month (November 2025)
+            const currentMonthTrans = filteredTransactions.filter(t => t.date.startsWith('2025-11'));
+            const currentMonthTotal = currentMonthTrans.reduce((sum, t) => sum + t.amount, 0);
+            document.getElementById('metric-current-month').textContent = formatCurrency(currentMonthTotal);
+
+            // Interest and Debt
+            document.getElementById('metric-interest').textContent = formatCurrency(EXPENSE_DATA.summary.totalInterest);
+            document.getElementById('metric-debt').textContent = formatCurrency(EXPENSE_DATA.summary.totalDebt);
+            document.getElementById('metric-debt-subtitle').textContent = `${EXPENSE_DATA.debtAccounts.length} accounts`;
+        }
+
+        function renderCharts() {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => chart.destroy());
+            charts = {};
+
+            // Chart: Spending by Person
+            const personData = {};
+            filteredTransactions.forEach(t => {
+                personData[t.person] = (personData[t.person] || 0) + t.amount;
+            });
+            charts.byPerson = new Chart(document.getElementById('chart-by-person'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(personData),
+                    datasets: [{
+                        data: Object.values(personData),
+                        backgroundColor: Object.keys(personData).map(p => PERSON_COLORS[p] || '#6b7280')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.label}: ${formatCurrency(ctx.raw)} (${((ctx.raw / Object.values(personData).reduce((a,b)=>a+b,0)) * 100).toFixed(1)}%)`
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Chart: Top 10 Categories
+            const categoryData = {};
+            filteredTransactions.forEach(t => {
+                categoryData[t.category] = (categoryData[t.category] || 0) + t.amount;
+            });
+            const sortedCategories = Object.entries(categoryData)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+            charts.byCategory = new Chart(document.getElementById('chart-by-category'), {
+                type: 'bar',
+                data: {
+                    labels: sortedCategories.map(c => c[0].length > 20 ? c[0].substring(0, 20) + '...' : c[0]),
+                    datasets: [{
+                        data: sortedCategories.map(c => c[1]),
+                        backgroundColor: CATEGORY_COLORS
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => formatCurrency(ctx.raw)
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { callback: (v) => formatCurrency(v) }
+                        }
+                    }
+                }
+            });
+
+            // Chart: Monthly Trend
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const monthlyData = new Array(12).fill(0);
+            filteredTransactions.forEach(t => {
+                const month = parseInt(t.date.split('-')[1]) - 1;
+                monthlyData[month] += t.amount;
+            });
+            charts.monthlyTrend = new Chart(document.getElementById('chart-monthly-trend'), {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Monthly Spending',
+                        data: monthlyData,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => formatCurrency(ctx.raw)
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { callback: (v) => formatCurrency(v) },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Chart: Monthly by Person (Stacked Bar)
+            const personNames = ['Edmund', 'Sam', 'Sophie', 'Chloe'];
+            const monthlyByPerson = personNames.map(person => {
+                const data = new Array(12).fill(0);
+                filteredTransactions
+                    .filter(t => t.person === person)
+                    .forEach(t => {
+                        const month = parseInt(t.date.split('-')[1]) - 1;
+                        data[month] += t.amount;
+                    });
+                return {
+                    label: person,
+                    data: data,
+                    backgroundColor: PERSON_COLORS[person]
+                };
+            });
+            charts.monthlyByPerson = new Chart(document.getElementById('chart-monthly-by-person'), {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: monthlyByPerson
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { stacked: true },
+                        y: {
+                            stacked: true,
+                            ticks: { callback: (v) => formatCurrency(v) },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            if (charts.byPerson) {
+                const personData = {};
+                filteredTransactions.forEach(t => {
+                    personData[t.person] = (personData[t.person] || 0) + t.amount;
+                });
+                charts.byPerson.data.labels = Object.keys(personData);
+                charts.byPerson.data.datasets[0].data = Object.values(personData);
+                charts.byPerson.data.datasets[0].backgroundColor = Object.keys(personData).map(p => PERSON_COLORS[p] || '#6b7280');
+                charts.byPerson.update();
+            }
+
+            if (charts.byCategory) {
+                const categoryData = {};
+                filteredTransactions.forEach(t => {
+                    categoryData[t.category] = (categoryData[t.category] || 0) + t.amount;
+                });
+                const sortedCategories = Object.entries(categoryData)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 10);
+                charts.byCategory.data.labels = sortedCategories.map(c => c[0].length > 20 ? c[0].substring(0, 20) + '...' : c[0]);
+                charts.byCategory.data.datasets[0].data = sortedCategories.map(c => c[1]);
+                charts.byCategory.update();
+            }
+
+            if (charts.monthlyTrend) {
+                const monthlyData = new Array(12).fill(0);
+                filteredTransactions.forEach(t => {
+                    const month = parseInt(t.date.split('-')[1]) - 1;
+                    monthlyData[month] += t.amount;
+                });
+                charts.monthlyTrend.data.datasets[0].data = monthlyData;
+                charts.monthlyTrend.update();
+            }
+
+            if (charts.monthlyByPerson) {
+                const personNames = ['Edmund', 'Sam', 'Sophie', 'Chloe'];
+                personNames.forEach((person, i) => {
+                    const data = new Array(12).fill(0);
+                    filteredTransactions
+                        .filter(t => t.person === person)
+                        .forEach(t => {
+                            const month = parseInt(t.date.split('-')[1]) - 1;
+                            data[month] += t.amount;
+                        });
+                    charts.monthlyByPerson.data.datasets[i].data = data;
+                });
+                charts.monthlyByPerson.update();
+            }
+        }
+
+        function renderPersonSummaryTable() {
+            const tbody = document.getElementById('person-summary-body');
+            tbody.innerHTML = EXPENSE_DATA.personSummary.map(p => `
+                <tr class="clickable-row" onclick="showPersonDetail('${p.name}')">
+                    <td><strong>${p.name}</strong></td>
+                    <td class="amount-neutral">${formatCurrency(p.totalSpent)}</td>
+                    <td>${(p.percentOfFamily * 100).toFixed(1)}%</td>
+                    <td>${p.numTransactions}</td>
+                    <td>${formatCurrency(p.avgTransaction)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Transactions Table
+        function renderTransactionsTable() {
+            // Sort
+            const sorted = [...filteredTransactions].sort((a, b) => {
+                let aVal = a[sortColumn];
+                let bVal = b[sortColumn];
+                if (sortColumn === 'amount') {
+                    aVal = parseFloat(aVal);
+                    bVal = parseFloat(bVal);
+                }
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            // Paginate
+            const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIdx = startIdx + ITEMS_PER_PAGE;
+            const pageData = sorted.slice(startIdx, endIdx);
+
+            // Render
+            const tbody = document.getElementById('transactions-body');
+            tbody.innerHTML = pageData.map(t => `
+                <tr>
+                    <td>${formatDate(t.date)}</td>
+                    <td>${escapeHtml(t.description)}</td>
+                    <td><span class="badge badge-blue">${escapeHtml(t.category)}</span></td>
+                    <td class="amount-neutral">${formatCurrency(t.amount)}</td>
+                    <td>${escapeHtml(t.person)}</td>
+                    <td>${escapeHtml(t.source)}</td>
+                </tr>
+            `).join('');
+
+            // Update count
+            document.getElementById('transactions-count').textContent = `${filteredTransactions.length} transactions`;
+
+            // Update pagination
+            renderPagination(sorted.length);
+        }
+
+        function renderPagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+            const startIdx = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+            const endIdx = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
+
+            document.getElementById('pagination-info').textContent =
+                totalItems > 0 ? `Showing ${startIdx}-${endIdx} of ${totalItems}` : 'No results';
+
+            const buttons = document.getElementById('pagination-buttons');
+            buttons.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // Prev
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'pagination-btn';
+            prevBtn.textContent = 'Prev';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => { currentPage--; renderTransactionsTable(); };
+            buttons.appendChild(prevBtn);
+
+            // Page numbers
+            const maxButtons = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+            if (endPage - startPage < maxButtons - 1) {
+                startPage = Math.max(1, endPage - maxButtons + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const btn = document.createElement('button');
+                btn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+                btn.textContent = i;
+                btn.onclick = () => { currentPage = i; renderTransactionsTable(); };
+                buttons.appendChild(btn);
+            }
+
+            // Next
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'pagination-btn';
+            nextBtn.textContent = 'Next';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = () => { currentPage++; renderTransactionsTable(); };
+            buttons.appendChild(nextBtn);
+        }
+
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = column === 'amount' ? 'desc' : 'asc';
+            }
+
+            // Update UI
+            document.querySelectorAll('#transactions-table th').forEach(th => {
+                th.classList.remove('sorted');
+                const indicator = th.querySelector('.sort-indicator');
+                if (indicator) indicator.textContent = '↕';
+            });
+            const activeHeader = document.querySelector(`th[data-sort="${column}"]`);
+            activeHeader.classList.add('sorted');
+            activeHeader.querySelector('.sort-indicator').textContent = sortDirection === 'asc' ? '↑' : '↓';
+
+            renderTransactionsTable();
+        }
+
+        // By Person
+        function renderPersonCards() {
+            const container = document.getElementById('person-cards');
+            container.innerHTML = EXPENSE_DATA.personSummary.map(p => `
+                <div class="metric-card clickable-row" onclick="showPersonDetail('${p.name}')" style="cursor: pointer; border-left: 4px solid ${PERSON_COLORS[p.name]}">
+                    <div class="metric-label">${p.name}</div>
+                    <div class="metric-value neutral">${formatCurrency(p.totalSpent)}</div>
+                    <div class="metric-subtitle">${p.numTransactions} transactions • ${(p.percentOfFamily * 100).toFixed(1)}% of family</div>
+                </div>
+            `).join('');
+        }
+
+        function showPersonDetail(name) {
+            document.getElementById('person-list-view').style.display = 'none';
+            document.getElementById('person-detail-view').style.display = 'block';
+
+            document.getElementById('person-name').textContent = name;
+            document.getElementById('person-avatar').textContent = name[0];
+            document.getElementById('person-avatar').style.backgroundColor = PERSON_COLORS[name];
+
+            const personTransactions = filteredTransactions.filter(t => t.person === name);
+            const total = personTransactions.reduce((sum, t) => sum + t.amount, 0);
+            const avgTransaction = personTransactions.length > 0 ? total / personTransactions.length : 0;
+
+            document.getElementById('person-subtitle').textContent = `${personTransactions.length} transactions`;
+
+            // Summary cards
+            document.getElementById('person-summary-cards').innerHTML = `
+                <div class="summary-card">
+                    <div class="summary-card-label">Total Spent</div>
+                    <div class="summary-card-value" style="color: var(--primary-blue)">${formatCurrency(total)}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label"># Transactions</div>
+                    <div class="summary-card-value">${personTransactions.length}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Avg Transaction</div>
+                    <div class="summary-card-value">${formatCurrency(avgTransaction)}</div>
+                </div>
+            `;
+
+            // Category chart for person
+            if (charts.personCategories) charts.personCategories.destroy();
+            const categoryData = {};
+            personTransactions.forEach(t => {
+                categoryData[t.category] = (categoryData[t.category] || 0) + t.amount;
+            });
+            const sortedCats = Object.entries(categoryData).sort((a, b) => b[1] - a[1]).slice(0, 10);
+            charts.personCategories = new Chart(document.getElementById('chart-person-categories'), {
+                type: 'doughnut',
+                data: {
+                    labels: sortedCats.map(c => c[0]),
+                    datasets: [{
+                        data: sortedCats.map(c => c[1]),
+                        backgroundColor: CATEGORY_COLORS
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.label}: ${formatCurrency(ctx.raw)}`
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Transactions table
+            document.getElementById('person-transactions-count').textContent = `${personTransactions.length} transactions`;
+            document.getElementById('person-transactions-body').innerHTML = personTransactions
+                .sort((a, b) => b.date.localeCompare(a.date))
+                .map(t => `
+                    <tr>
+                        <td>${formatDate(t.date)}</td>
+                        <td>${escapeHtml(t.description)}</td>
+                        <td><span class="badge badge-blue">${escapeHtml(t.category)}</span></td>
+                        <td class="amount-neutral">${formatCurrency(t.amount)}</td>
+                        <td>${escapeHtml(t.source)}</td>
+                    </tr>
+                `).join('');
+        }
+
+        function showPersonList() {
+            document.getElementById('person-list-view').style.display = 'block';
+            document.getElementById('person-detail-view').style.display = 'none';
+        }
+
+        // By Category
+        function renderCategoryAnalysis() {
+            const categoryData = {};
+            const categoryCounts = {};
+            EXPENSE_DATA.transactions.forEach(t => {
+                categoryData[t.category] = (categoryData[t.category] || 0) + t.amount;
+                categoryCounts[t.category] = (categoryCounts[t.category] || 0) + 1;
+            });
+
+            const total = Object.values(categoryData).reduce((a, b) => a + b, 0);
+            const sorted = Object.entries(categoryData).sort((a, b) => b[1] - a[1]);
+
+            document.getElementById('category-analysis-body').innerHTML = sorted.map(([cat, amount]) => `
+                <tr class="clickable-row" onclick="showCategoryDetail('${escapeHtml(cat)}')">
+                    <td><strong>${escapeHtml(cat)}</strong></td>
+                    <td class="amount-neutral">${formatCurrency(amount)}</td>
+                    <td>${((amount / total) * 100).toFixed(1)}%</td>
+                    <td>${categoryCounts[cat]}</td>
+                </tr>
+            `).join('');
+        }
+
+        function showCategoryDetail(category) {
+            document.getElementById('category-list-view').style.display = 'none';
+            document.getElementById('category-detail-view').style.display = 'block';
+
+            document.getElementById('category-name').textContent = category;
+
+            const categoryTransactions = filteredTransactions.filter(t => t.category === category);
+            const total = categoryTransactions.reduce((sum, t) => sum + t.amount, 0);
+            const avgTransaction = categoryTransactions.length > 0 ? total / categoryTransactions.length : 0;
+
+            document.getElementById('category-subtitle').textContent = `${categoryTransactions.length} transactions`;
+
+            // Summary cards
+            document.getElementById('category-summary-cards').innerHTML = `
+                <div class="summary-card">
+                    <div class="summary-card-label">Total Spent</div>
+                    <div class="summary-card-value" style="color: var(--primary-blue)">${formatCurrency(total)}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label"># Transactions</div>
+                    <div class="summary-card-value">${categoryTransactions.length}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Avg Transaction</div>
+                    <div class="summary-card-value">${formatCurrency(avgTransaction)}</div>
+                </div>
+            `;
+
+            // Transactions table
+            document.getElementById('category-transactions-body').innerHTML = categoryTransactions
+                .sort((a, b) => b.date.localeCompare(a.date))
+                .map(t => `
+                    <tr>
+                        <td>${formatDate(t.date)}</td>
+                        <td>${escapeHtml(t.description)}</td>
+                        <td class="amount-neutral">${formatCurrency(t.amount)}</td>
+                        <td>${escapeHtml(t.person)}</td>
+                        <td>${escapeHtml(t.source)}</td>
+                    </tr>
+                `).join('');
+        }
+
+        function showCategoryList() {
+            document.getElementById('category-list-view').style.display = 'block';
+            document.getElementById('category-detail-view').style.display = 'none';
+        }
+
+        // Debt Tracker
+        function renderDebtTracker() {
+            const totalDebt = EXPENSE_DATA.debtAccounts.reduce((sum, d) => sum + d.balance, 0);
+            const totalInterest = EXPENSE_DATA.debtAccounts.reduce((sum, d) => sum + d.interestPaid, 0);
+            const annualInterest = totalInterest * 12;
+
+            document.getElementById('debt-total').textContent = formatCurrency(totalDebt);
+            document.getElementById('debt-monthly-interest').textContent = formatCurrency(totalInterest);
+            document.getElementById('debt-annual-interest').textContent = formatCurrency(annualInterest);
+
+            document.getElementById('debt-cards').innerHTML = EXPENSE_DATA.debtAccounts.map(d => `
+                <div class="debt-card">
+                    <div class="debt-card-header">
+                        <h4>${escapeHtml(d.account)}</h4>
+                        <span class="debt-type">${escapeHtml(d.type)}</span>
+                    </div>
+                    <div class="debt-card-body">
+                        <div class="debt-stat">
+                            <span class="debt-stat-label">Balance</span>
+                            <span class="debt-stat-value amount-negative">${formatCurrency(d.balance)}</span>
+                        </div>
+                        <div class="debt-stat">
+                            <span class="debt-stat-label">Interest Paid (This Month)</span>
+                            <span class="debt-stat-value amount-negative">${formatCurrency(d.interestPaid)}</span>
+                        </div>
+                        ${d.interestRate ? `
+                        <div class="debt-stat">
+                            <span class="debt-stat-label">Interest Rate</span>
+                            <span class="debt-stat-value">${(d.interestRate * 100).toFixed(3)}%</span>
+                        </div>
+                        ` : ''}
+                        ${d.notes ? `<div class="debt-notes">${escapeHtml(d.notes)}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Utility Functions
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    </script>
+</body>
+</html>
