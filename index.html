@@ -833,9 +833,9 @@
                         <div class="metric-subtitle" id="metric-month-name">November 2025</div>
                     </div>
                     <div class="metric-card warning">
-                        <div class="metric-label">Total Interest Paid</div>
+                        <div class="metric-label">YTD Interest Paid</div>
                         <div class="metric-value negative" id="metric-interest">$0.00</div>
-                        <div class="metric-subtitle">Monthly interest charges</div>
+                        <div class="metric-subtitle">Year-to-date interest charges</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-label">Total Debt Balance</div>
@@ -1216,8 +1216,9 @@
             const currentMonthTotal = currentMonthTrans.reduce((sum, t) => sum + t.amount, 0);
             document.getElementById('metric-current-month').textContent = formatCurrency(currentMonthTotal);
 
-            // Interest and Debt
-            document.getElementById('metric-interest').textContent = formatCurrency(EXPENSE_DATA.summary.totalInterest);
+            // Interest and Debt - use YTD interest if available
+            const ytdInterest = EXPENSE_DATA.summary.totalInterestYTD || EXPENSE_DATA.summary.totalInterest || 0;
+            document.getElementById('metric-interest').textContent = formatCurrency(ytdInterest);
             document.getElementById('metric-debt').textContent = formatCurrency(EXPENSE_DATA.summary.totalDebt);
             document.getElementById('metric-debt-subtitle').textContent = `${EXPENSE_DATA.debtAccounts.length} accounts`;
         }
@@ -1711,12 +1712,16 @@
         // Debt Tracker
         function renderDebtTracker() {
             const totalDebt = EXPENSE_DATA.debtAccounts.reduce((sum, d) => sum + d.balance, 0);
-            const totalInterest = EXPENSE_DATA.debtAccounts.reduce((sum, d) => sum + d.interestPaid, 0);
-            const annualInterest = totalInterest * 12;
+            const ytdInterest = EXPENSE_DATA.debtAccounts.reduce((sum, d) => sum + (d.ytdInterest || 0), 0);
+            const annualInterest = ytdInterest * (12 / EXPENSE_DATA.metadata.dataMonths.filter(m => m.startsWith('2025')).length);
 
             document.getElementById('debt-total').textContent = formatCurrency(totalDebt);
-            document.getElementById('debt-monthly-interest').textContent = formatCurrency(totalInterest);
+            document.getElementById('debt-monthly-interest').textContent = formatCurrency(ytdInterest);
             document.getElementById('debt-annual-interest').textContent = formatCurrency(annualInterest);
+
+            // Update labels to reflect YTD
+            document.querySelector('#tab-debt-tracker .metric-card:nth-child(2) .metric-subtitle').textContent = 'Year-to-date interest';
+            document.querySelector('#tab-debt-tracker .metric-card:nth-child(3) .metric-subtitle').textContent = 'Projected annual cost';
 
             document.getElementById('debt-cards').innerHTML = EXPENSE_DATA.debtAccounts.map(d => `
                 <div class="debt-card">
@@ -1730,13 +1735,13 @@
                             <span class="debt-stat-value amount-negative">${formatCurrency(d.balance)}</span>
                         </div>
                         <div class="debt-stat">
-                            <span class="debt-stat-label">Interest Paid (This Month)</span>
-                            <span class="debt-stat-value amount-negative">${formatCurrency(d.interestPaid)}</span>
+                            <span class="debt-stat-label">YTD Interest Paid</span>
+                            <span class="debt-stat-value amount-negative">${formatCurrency(d.ytdInterest || 0)}</span>
                         </div>
                         ${d.interestRate ? `
                         <div class="debt-stat">
                             <span class="debt-stat-label">Interest Rate</span>
-                            <span class="debt-stat-value">${(d.interestRate * 100).toFixed(3)}%</span>
+                            <span class="debt-stat-value">${(d.interestRate * 100).toFixed(2)}%</span>
                         </div>
                         ` : ''}
                         ${d.notes ? `<div class="debt-notes">${escapeHtml(d.notes)}</div>` : ''}
